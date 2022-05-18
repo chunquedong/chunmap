@@ -36,12 +36,14 @@ abstract class Layer
     if (r.view.scale > this.maxScale) return
     
     for (i:=0; i<symbolizers.size; ++i) {
+        r.g.push
         sym := symbolizers[i]
         if (sym.beginRender(r)) {
             r.symbolizer = sym
             renderLayer(i, r)
             sym.endRender(r)
         }
+        r.g.pop
     }
   }
 

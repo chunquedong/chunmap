@@ -117,11 +117,14 @@ class FeatureList : FeatureSet
   }
 
   static FeatureList fromTsv(File file) {
+    return fromTsvStream(file.in, file.basename)
+  }
+
+  static FeatureList fromTsvStream(InStream in, Str name) {
     eb := EnvelopeBuilder.makeNone
-    table := TableDefBuilder(file.basename, ShapeFeature#)
+    table := TableDefBuilder(name, ShapeFeature#)
     
     //read header
-    in := file.in
     Str? line = in.readLine
     if (line != null) {
       fs := line.split('\t')

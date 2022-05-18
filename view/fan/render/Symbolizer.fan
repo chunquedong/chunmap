@@ -43,11 +43,9 @@ abstract class Symbolizer
     if (r.g.alpha != this.alpha) r.g.alpha = this.alpha
     if (r.g.antialias != this.antialias) r.g.antialias = this.antialias
     
-    r.g.push
     return true
   }
 
   virtual Void endRender(RenderEnv r) {
-    r.g.pop
   }
 }
