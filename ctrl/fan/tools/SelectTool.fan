@@ -91,17 +91,21 @@ abstract class SelectTool : Tool
         VectorLayer vl := lyr
         vl.dataSource.each(cond) |f|
         {
-          if (!multiSelect && features.size >0) {}
-          else
-          {
-            shp := f as Shape
-            if (shp != null)
+          try {
+            if (!multiSelect && features.size >0) {}
+            else
             {
-              if (env.intersectsGeometry(shp.geometry)) {
-                if (mainSelectedLayer == null) mainSelectedLayer = lyr
-                features.add(f)
+              shp := f as Shape
+              if (shp != null)
+              {
+                if (env.intersectsGeometry(shp.geometry)) {
+                  if (mainSelectedLayer == null) mainSelectedLayer = lyr
+                  features.add(f)
+                }
               }
             }
+          } catch (Err e) {
+            e.trace
           }
         }
       }

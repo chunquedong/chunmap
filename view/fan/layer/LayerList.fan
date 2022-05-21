@@ -24,22 +24,19 @@ class LayerList
   Layer? decorateLayer
   @Transient
   Layer? selectedLayer
-  @Transient
-  Envelope? envelope { private set }
+
 
   This add(Layer layer)
   {
     if (layers.containsSame(layer)) return this
     while (findIndex(layer.name) != -1) layer.name += "\$"
     layers.add(layer)
-    recalcuEnvelope
     return this
   }
 
   Void remove(Layer layer)
   {
     layers.remove(layer)
-    recalcuEnvelope
   }
   
   Void moveLayer(Layer from, Layer to, Bool before) {
@@ -88,17 +85,13 @@ class LayerList
     LabelSym.reset
   }
 
-//////////////////////////////////////////////////////////////////////////
-// reComputeEnvelop
-//////////////////////////////////////////////////////////////////////////
-
-  Void recalcuEnvelope()
+  Envelope envelope()
   {
     env := EnvelopeBuilder.makeNone
     layers.each |lyr|
     {
       env.merge(lyr.envelope)
     }
-    envelope = env.toEnvelope
+    return env.toEnvelope
   }
 }

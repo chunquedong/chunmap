@@ -18,8 +18,10 @@ class Build : build::BuildPod
     depends =
     [
       "sys 2.0", "std 1.0",
+      "concurrent 1.0",
       "slanRecord 1.0",
-      "chunmapModel 1.0"
+      "chunmapModel 1.0",
+      "vaseClient 1.0",
     ]
     srcDirs =
     [

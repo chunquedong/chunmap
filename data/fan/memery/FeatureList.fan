@@ -10,6 +10,8 @@
 
 using chunmapModel
 using slanRecord
+using vaseClient
+using concurrent
 
 **
 ** FeatureList
@@ -17,12 +19,15 @@ using slanRecord
 @Js
 class FeatureList : FeatureSet
 {
+  @Transient
+  const |->|? onLoaded
   Feature[] features
   
 
   new make(Envelope env, TableDef schema, Feature[] features := [,]) : super(env, schema)
   {
     this.features = features
+    onLoaded = Actor.locals["chunmapTaster.TileDataSource.callback"]
   }
 
   override This add(Feature f) { features.add(f); return this }
@@ -84,12 +89,36 @@ class FeatureList : FeatureSet
   }
 
   static FeatureList fromUri(Uri uri, [Str:Str]? options = null) {
-    if (uri.ext == "tsv") {
+    if (Env.cur.isJs || uri.scheme == "http" || uri.scheme == "https") {
+      return fromWeb(uri)
+    }
+    else if (uri.ext == "tsv") {
       return fromTsv(uri.toFile)
     }
     else {
       return GeoDataAdapter.buildFeatureSet(uri, options)
     }
+  }
+
+  static FeatureList fromWeb(Uri uri) {
+    fs := FeatureList(Envelope(0.0,0.0,0.0,0.0), TableDefBuilder(uri.basename, ShapeFeature#).build)
+    fs.uri = uri
+
+    task := HttpReq { it.uri = uri; }.get
+    task.then |HttpRes? res, Err? err| {
+      if (res != null) {
+        Str tsv := res.content
+        f := FeatureList.fromTsvStream(tsv.in, uri.basename)
+        fs.schema = f.schema
+        fs.metadata = f.metadata
+        fs.envelope = f.envelope
+        fs.features = f.features
+        if (fs.onLoaded != null) {
+          fs.onLoaded.call()
+        }
+      }
+    }
+    return fs
   }
 
   Void saveAs(File file) {

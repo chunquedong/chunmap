@@ -128,7 +128,11 @@ class LineAlgorithm
     Int n1 := l1.size
     for (i1 := 1; i1 < n1; ++i1)
     {
-      ls1 := LineSegment(l1.get(i1-1), l1.get(i1))
+      p1 := l1.get(i1-1)
+      p2 := l1.get(i1)
+      if (p1 == p2) continue
+      
+      ls1 := LineSegment(p1, p2)
       list.add(ls1)
     }
     return list
